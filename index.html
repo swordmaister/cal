@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ブロック制ポイント計算機</title>
+    <style>
+        body {
+            font-family: 'Hiragino Sans', 'Meiryo', 'MS PGothic', sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+
+    .container {
+        background: white;
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    h1 {
+        color: #333;
+        margin-bottom: 40px;
+        font-size: 2.2rem;
+        font-weight: 300;
+    }
+    
+    .input-section {
+        margin-bottom: 30px;
+    }
+    
+    input[type="number"] {
+        width: 200px;
+        max-width: 90%;
+        padding: 15px 20px;
+        border: 2px solid #e1e5e9;
+        border-radius: 50px;
+        font-size: 18px;
+        text-align: center;
+        transition: all 0.3s ease;
+        outline: none;
+    }
+    
+    input[type="number"]:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .quick-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 20px;
+    }
+    
+    .quick-button {
+        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+        color: #1565c0;
+        border: 2px solid #90caf9;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 50px;
+    }
+    
+    .quick-button:hover {
+        background: linear-gradient(135deg, #bbdefb, #90caf9);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+    }
+    
+    .quick-button:active {
+        transform: translateY(0);
+    }
+    
+    .control-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .control-button {
+        background: linear-gradient(135deg, #ffecb3, #ffe082);
+        color: #f57f17;
+        border: 2px solid #ffcc02;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .control-button:hover {
+        background: linear-gradient(135deg, #ffe082, #ffd54f);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(245, 127, 23, 0.3);
+    }
+    
+    .result-section {
+        display: none;
+        margin: 30px 0;
+    }
+    
+    .result-item {
+        margin: 20px 0;
+        font-size: 20px;
+    }
+    
+    .result-item.main {
+        font-size: 28px;
+        font-weight: bold;
+        margin: 30px 0;
+    }
+    
+    .tax-excluded {
+        color: #007bff;
+    }
+    
+    .tax-included {
+        color: #28a745;
+    }
+    
+    .toggle-button {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 20px 10px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .toggle-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .details-section {
+        display: none;
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 15px;
+        margin-top: 20px;
+        text-align: left;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .block-info {
+        margin: 8px 0;
+        font-size: 14px;
+        color: #495057;
+    }
+    
+    .rate-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 14px;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .rate-table th, .rate-table td {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    .rate-table th {
+        background: #667eea;
+        color: white;
+        font-weight: bold;
+    }
+    
+    .rate-table tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+    
+    .close-button {
+        background: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        cursor: pointer;
+        float: right;
+        margin-bottom: 10px;
+    }
+    
+    .close-button:hover {
+        background: #5a6268;
+    }
+</style>
+`
+
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 ポイント計算機</h1>
+
+
+    <div class="input-section">
+        <input type="number" id="points" placeholder="ポイント数を入力" min="0" max="99999999" oninput="calculateAmount()">
+        
+        <div class="quick-buttons">
+            <button class="quick-button" onclick="addPoints(1000)">+1000</button>
+            <button class="quick-button" onclick="addPoints(500)">+500</button>
+            <button class="quick-button" onclick="addPoints(100)">+100</button>
+            <button class="quick-button" onclick="addPoints(50)">+50</button>
+            <button class="quick-button" onclick="addPoints(10)">+10</button>
+            <button class="quick-button" onclick="addPoints(5)">+5</button>
+            <button class="quick-button" onclick="addPoints(1)">+1</button>
+        </div>
+        
+        <div class="control-buttons">
+            <button class="control-button" onclick="clearPoints()">🗑️ クリア</button>
+            <button class="control-button" onclick="setRoundNumber()">📦 きりの良い数</button>
+        </div>
+    </div>
+    
+    <div id="result" class="result-section">
+        <div class="result-item">
+            <strong>達成ブロック:</strong> <span id="blockCount"></span>
+        </div>
+        <div class="result-item main tax-excluded">
+            税抜: <span id="taxExcluded"></span>円
+        </div>
+        <div class="result-item main tax-included">
+            税込: <span id="taxIncluded"></span>円
+        </div>
+        
+        <div>
+            <button class="toggle-button" onclick="toggleDetails()">📊 計算詳細</button>
+            <button class="toggle-button" onclick="toggleRateTable()">📋 レート表</button>
+        </div>
+    </div>
+    
+    <div id="calculationDetails" class="details-section">
+        <button class="close-button" onclick="hideDetails()">✕</button>
+        <h3>🧮 計算詳細</h3>
+        <div id="calculationSteps"></div>
+    </div>
+    
+    <div id="rateTableSection" class="details-section">
+        <button class="close-button" onclick="hideRateTable()">✕</button>
+        <h3>📋 ブロック別レート表</h3>
+        <p><strong>1ブロック = 500ポイント</strong></p>
+        <p>端数も達成済みブロックの最高レートで計算されます</p>
+        <table class="rate-table">
+            <thead>
+                <tr>
+                    <th>ブロック</th>
+                    <th>ポイント範囲</th>
+                    <th>レート (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>1ブロック目</td><td>1 - 500</td><td>5%</td></tr>
+                <tr><td>2ブロック目</td><td>501 - 1,000</td><td>5%</td></tr>
+                <tr><td>3ブロック目</td><td>1,001 - 1,500</td><td>10%</td></tr>
+                <tr><td>4ブロック目</td><td>1,501 - 2,000</td><td>15%</td></tr>
+                <tr><td>5ブロック目</td><td>2,001 - 2,500</td><td>20%</td></tr>
+                <tr><td>6ブロック目</td><td>2,501 - 3,000</td><td>25%</td></tr>
+                <tr><td>7ブロック目以降</td><td>3,001以上</td><td>30%</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const blockRates = [
+        { block: 1, rate: 5 },
+        { block: 2, rate: 5 },
+        { block: 3, rate: 10 },
+        { block: 4, rate: 15 },
+        { block: 5, rate: 20 },
+        { block: 6, rate: 25 },
+        { block: 7, rate: 30 }
+    ];
+    
+    const POINTS_PER_BLOCK = 500;
+    const BASE_AMOUNT = 120;
+    const TAX_RATE = 1.1;
+    const MAX_RATE = 30;
+    
+    function getBlockNumber(points) {
+        return Math.floor((points - 1) / POINTS_PER_BLOCK) + 1;
+    }
+    
+    function getRateForBlock(blockNumber) {
+        if (blockNumber <= 0) return 0;
+        if (blockNumber <= blockRates.length) {
+            return blockRates[blockNumber - 1].rate;
+        }
+        return MAX_RATE;
+    }
+    
+    function calculateAmount() {
+        const pointsInput = document.getElementById('points');
+        const points = parseInt(pointsInput.value);
+        const resultDiv = document.getElementById('result');
+        
+        if (isNaN(points) || points <= 0) {
+            resultDiv.style.display = 'none';
+            hideDetails();
+            hideRateTable();
+            return;
+        }
+        
+        const completedBlocks = Math.floor(points / POINTS_PER_BLOCK);
+        const remainderPoints = points % POINTS_PER_BLOCK;
+        
+        let totalAmount = 0;
+        let calculationDetails = [];
+        
+        for (let block = 1; block <= completedBlocks; block++) {
+            const rate = getRateForBlock(block);
+            const blockAmount = POINTS_PER_BLOCK * (rate / 100) * BASE_AMOUNT;
+            totalAmount += blockAmount;
+            
+            calculationDetails.push({
+                block: block,
+                points: POINTS_PER_BLOCK,
+                rate: rate,
+                amount: blockAmount,
+                type: 'completed'
+            });
+        }
+        
+        let remainderAmount = 0;
+        if (remainderPoints > 0 && completedBlocks > 0) {
+            const remainderRate = getRateForBlock(completedBlocks);
+            remainderAmount = remainderPoints * (remainderRate / 100) * BASE_AMOUNT;
+            totalAmount += remainderAmount;
+            
+            calculationDetails.push({
+                block: completedBlocks + 'ブロック目レート',
+                points: remainderPoints,
+                rate: remainderRate,
+                amount: remainderAmount,
+                type: 'remainder'
+            });
+        }
+        
+        const taxExcludedAmount = Math.floor(totalAmount);
+        const taxIncludedAmount = Math.floor(taxExcludedAmount * TAX_RATE);
+        
+        document.getElementById('blockCount').textContent = completedBlocks + 'ブロック' + (remainderPoints > 0 ? ' + 端数' : '');
+        document.getElementById('taxExcluded').textContent = taxExcludedAmount.toLocaleString();
+        document.getElementById('taxIncluded').textContent = taxIncludedAmount.toLocaleString();
+        
+        let detailsHTML = '<div class="block-info">🎯 入力ポイント: <strong>' + points.toLocaleString() + 'ポイント</strong></div>';
+        detailsHTML += '<div class="block-info">📦 完全達成ブロック: <strong>' + completedBlocks + 'ブロック</strong> (' + (completedBlocks * POINTS_PER_BLOCK).toLocaleString() + 'ポイント)</div>';
+        detailsHTML += '<div class="block-info">📊 端数ポイント: <strong>' + remainderPoints + 'ポイント</strong>';
+        if (remainderPoints > 0 && completedBlocks > 0) {
+            detailsHTML += ' (' + getRateForBlock(completedBlocks) + '%で計算)';
+        } else if (remainderPoints > 0) {
+            detailsHTML += ' (達成ブロックなしのため計算対象外)';
+        }
+        detailsHTML += '</div><br><div style="font-weight: bold; color: #495057;">🧮 ブロック別計算:</div>';
+        
+        if (completedBlocks === 0 && remainderPoints > 0) {
+            detailsHTML += '<div class="block-info">⚠️ 完全達成ブロックがないため、端数も計算対象外です</div>';
+        } else if (completedBlocks === 0) {
+            detailsHTML += '<div class="block-info">⚠️ ポイントが入力されていません</div>';
+        } else {
+            for (let i = 0; i < calculationDetails.length; i++) {
+                const detail = calculationDetails[i];
+                if (detail.type === 'completed') {
+                    detailsHTML += '<div class="block-info">📋 ' + detail.block + 'ブロック目: ' + detail.points + 'pt × ' + detail.rate + '% × ' + BASE_AMOUNT + '円 = <strong>' + Math.floor(detail.amount).toLocaleString() + '円</strong></div>';
+                } else if (detail.type === 'remainder') {
+                    detailsHTML += '<div class="block-info" style="color: #ff6b35;">📊 端数計算: ' + detail.points + 'pt × ' + detail.rate + '% × ' + BASE_AMOUNT + '円 = <strong>' + Math.floor(detail.amount).toLocaleString() + '円</strong></div>';
+                }
+            }
+            
+            detailsHTML += '<br><div class="block-info">💰 合計税抜: <strong>' + taxExcludedAmount.toLocaleString() + '円</strong></div>';
+            detailsHTML += '<div class="block-info">💳 税込計算: ' + taxExcludedAmount.toLocaleString() + '円 × ' + TAX_RATE + ' = <strong>' + taxIncludedAmount.toLocaleString() + '円</strong></div>';
+        }
+        
+        document.getElementById('calculationSteps').innerHTML = detailsHTML;
+        resultDiv.style.display = 'block';
+    }
+    
+    function toggleDetails() {
+        const details = document.getElementById('calculationDetails');
+        const rateTable = document.getElementById('rateTableSection');
+        
+        if (details.style.display === 'block') {
+            details.style.display = 'none';
+        } else {
+            details.style.display = 'block';
+            rateTable.style.display = 'none';
+        }
+    }
+    
+    function toggleRateTable() {
+        const rateTable = document.getElementById('rateTableSection');
+        const details = document.getElementById('calculationDetails');
+        
+        if (rateTable.style.display === 'block') {
+            rateTable.style.display = 'none';
+        } else {
+            rateTable.style.display = 'block';
+            details.style.display = 'none';
+        }
+    }
+    
+    function hideDetails() {
+        document.getElementById('calculationDetails').style.display = 'none';
+    }
+    
+    function hideRateTable() {
+        document.getElementById('rateTableSection').style.display = 'none';
+    }
+    
+    function addPoints(amount) {
+        const pointsInput = document.getElementById('points');
+        const currentValue = parseInt(pointsInput.value) || 0;
+        pointsInput.value = currentValue + amount;
+        calculateAmount();
+    }
+    
+    function clearPoints() {
+        const pointsInput = document.getElementById('points');
+        pointsInput.value = '';
+        calculateAmount();
+    }
+    
+    function setRoundNumber() {
+        const pointsInput = document.getElementById('points');
+        const currentValue = parseInt(pointsInput.value) || 0;
+        const roundedValue = Math.ceil(currentValue / 500) * 500;
+        pointsInput.value = roundedValue;
+        calculateAmount();
+    }
+</script>
+
+
+</body>
+</html>
